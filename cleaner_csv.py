@@ -35,7 +35,7 @@ class CleanerCSV:
         """
         Main method for managing data cleaning methods
         based on specification.
-    """
+        """
         if self.specs.get("drop_duplicates"):
             self._drop_duplicates()
             logging.info("Drop duplicates.")
