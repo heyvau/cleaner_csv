@@ -35,7 +35,7 @@ class CleanerCSV:
         """
         Main method for managing data cleaning methods
         based on specification.
-    """
+        """
         if self.specs.get("drop_duplicates"):
             self._drop_duplicates()
             logging.info("Drop duplicates.")
@@ -72,7 +72,6 @@ class CleanerCSV:
             logging.info("Export to CSV.")
 
 
-    @keys_checking
     def _drop_duplicates(self) -> None:
         """
         Method removes duplicate rows.
@@ -80,7 +79,6 @@ class CleanerCSV:
         self.df_copy.drop_duplicates(inplace=True)
 
 
-    @keys_checking
     def _drop_na(self) -> None:
         """
         Method removes NaN values-containing rows.
