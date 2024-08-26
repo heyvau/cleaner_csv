@@ -1,11 +1,11 @@
 {
     "input_file" : "files/my_data.csv",
-    "output_file" : "data/my_data_clean1.csv",
+    "output_file" : "files/my_data_clean1.csv",
     "delimiter": ",",
 
     "input_file_profile": "profiles/input_file.html",
     "output_file_profile": "profiles/output_file.html",
-    "summary_file": "profiles/summary.txt",
+    "summary_file": "profiles/summary.html",
 
     "drop_duplicates" : true,
     "drop_na" : true,
