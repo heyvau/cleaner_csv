@@ -9,15 +9,17 @@ import sys
 logger = logging.getLogger(__name__)
 
 
-def keys_checking(func):
+def data_checking(func):
     """
-    Decorator for handling dictionary keys errors.
+    Decorator for handling dictionary data errors.
     """
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except KeyError as error:
             logger.error(f"Error in specification file. {error}")
+        except AttributeError as error:
+            logger.error(f"Check column's data type. {error}")
     return wrapper
 
 
