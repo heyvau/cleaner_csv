@@ -1,5 +1,5 @@
 import pandas as pd
-from utilities import FileHandler, keys_checking
+from utilities import FileHandler, data_checking
 from ydata_profiling import ProfileReport
 import logging
 
@@ -64,8 +64,9 @@ class CleanerCSV:
         self._correct_data_type()
         logging.info("Data type correction.")
 
-        if self.specs.get("clean_outliers"):
-            self._clean_outliers()
+        if self.specs.get("clean_outliers") and (
+            col_outlier := self.specs.get("col_outlier")):
+            self._clean_outliers(cols=col_outlier)
 
         if self.specs.get("export_output_file"):
             self._export_output_file()
@@ -86,7 +87,7 @@ class CleanerCSV:
         self.df_copy.dropna(how="all", inplace=True)
 
 
-    @keys_checking
+    @data_checking
     def _drop_columns(self, cols: list[str]) -> None:
         """
         Method removes specified columns.
@@ -94,7 +95,7 @@ class CleanerCSV:
         self.df_copy.drop(columns=cols, axis=1, inplace=True)
 
 
-    @keys_checking
+    @data_checking
     def _clean_str_columns(self, cols: list[str]) -> None:
         """
         Method removes whitespaces in specified string columns.
@@ -102,7 +103,7 @@ class CleanerCSV:
         self.df_copy[cols] = self.df_copy[cols].map(str.strip)
 
 
-    @keys_checking
+    @data_checking
     def _drop_row_title(self) -> None:
         """
         Method removes rows identical to header row.
@@ -111,7 +112,7 @@ class CleanerCSV:
         self.df_copy = self.df_copy[criteria]
 
 
-    @keys_checking
+    @data_checking
     def _replace_row_char(self) -> None:
         """
         Method for replacing characters in specified columns.
@@ -123,7 +124,7 @@ class CleanerCSV:
         self.df_copy[cols] = self.df_copy[cols].replace(change, regex=True)
 
 
-    @keys_checking
+    @data_checking
     def _correct_data_type(self) -> None:
         """
         Method for data type correction for specified columns.
@@ -142,9 +143,18 @@ class CleanerCSV:
         self.df_copy = self.df_copy.astype(convert_dict)
 
 
-    @keys_checking
-    def _clean_outliers(self):
-        pass
+    @data_checking
+    def _clean_outliers(self, cols: list[str]):
+        for col in cols:
+            Q1 = self.df_copy[col].quantile(25 / 100)
+            Q3 = self.df_copy[col].quantile(75 / 100)
+            IQR = Q3 - Q1
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+
+            self.df_copy = self.df_copy[
+                (self.df_copy[col] >= lower_bound) & (self.df_copy[col] <= upper_bound)
+            ].reset_index(drop=True)
 
 
     def _export_output_file(self) -> None:
@@ -180,6 +190,7 @@ class CleanerCSV:
 
 
 if __name__ == "__main__":
-    c = CleanerCSV()
+    ui = input("Please input the name of your specification file\nor press enter to use 'default_specs.json':\n")
+    c = (CleanerCSV() if not ui else CleanerCSV(ui))
     c.clean()
-    c.create_profiles()
+    # c.create_profiles()
