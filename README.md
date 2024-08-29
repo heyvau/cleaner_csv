@@ -24,7 +24,7 @@ In case when custom spec is not provided, "default_specs.json" will be used.
 ```
 
 
-2. Set path to HTML profiles for original and cleaned data. Summary file show you comparison of both data sets, but it's possible only when data types in column are equal (not after data type correction).
+2. Set path to HTML profiles for original and cleaned data. Summary file show you comparison of both data sets, but it's possible only when data types in columns are equal (not after data type correction).
 
 ```json
     "input_file_profile": "profiles/input_file.html",
