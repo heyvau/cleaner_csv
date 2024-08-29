@@ -67,6 +67,7 @@ class CleanerCSV:
         if self.specs.get("clean_outliers") and (
             col_outlier := self.specs.get("col_outlier")):
             self._clean_outliers(cols=col_outlier)
+            logging.info("Clean outliers.")
 
         if self.specs.get("export_output_file"):
             self._export_output_file()
@@ -145,6 +146,9 @@ class CleanerCSV:
 
     @data_checking
     def _clean_outliers(self, cols: list[str]):
+        """
+        Method removes outliers from data set using IQR
+        """
         for col in cols:
             Q1 = self.df_copy[col].quantile(25 / 100)
             Q3 = self.df_copy[col].quantile(75 / 100)
@@ -154,7 +158,7 @@ class CleanerCSV:
 
             self.df_copy = self.df_copy[
                 (self.df_copy[col] >= lower_bound) & (self.df_copy[col] <= upper_bound)
-            ].reset_index(drop=True)
+            ]
 
 
     def _export_output_file(self) -> None:
@@ -182,6 +186,11 @@ class CleanerCSV:
         FileHandler.create_profile(report=clean_report, filename=clean_file)
 
         try:
+            df_clean = FileHandler.read_csv(
+                filename=self.specs.get("output_file"),
+                sep=self.specs.get("delimiter")
+            )
+            clean_report = ProfileReport(df_clean, title="Clean")
             summary_file = self.specs.get("summary_file")
             summary_report = original_report.compare(clean_report)
             FileHandler.create_profile(report=summary_report, filename=summary_file)
@@ -193,4 +202,4 @@ if __name__ == "__main__":
     ui = input("Please input the name of your specification file\nor press enter to use 'default_specs.json':\n")
     c = (CleanerCSV() if not ui else CleanerCSV(ui))
     c.clean()
-    # c.create_profiles()
+    c.create_profiles()
